@@ -8,7 +8,7 @@
     body {
       margin: 0;
       font-family: 'Comic Sans MS', cursive;
-      background: #ffffff;
+      background: #0000000;
       background-size: cover;
       color: white;
       overflow: hidden;
@@ -240,37 +240,7 @@
     flowersContainer.appendChild(f);
   }
 
-  // background text
-  function generateText(){
-    const now=new Date();
-    const diffDays=Math.floor((targetDate-now)/(1000*60*60*24));
-
-    let soCount=Math.max(2,30-diffDays);
-    let phrase="I miss you";
-
-    for(let i=0;i<soCount;i++) phrase+=" so";
-    phrase+=" much";
-    phrase+=" ";
-
-    return phrase;
-  }
-
-  function populateBackground(){
-    const container=document.getElementById("bgText");
-    const phrase=generateText();
-
-    for(let i=0;i<200;i++){
-      const span=document.createElement("span");
-      span.innerText=phrase;
-      container.appendChild(span);
-    }
-  }
-
-  //populateBackground();
-
-    // ===== BACKGROUND TEXT FROM FILE =====
-// ===== BACKGROUND TEXT FROM INLINE MESSAGE =====
-
+  
 // 👉 write your full message here
 function generateText() {
   const now = new Date();
