@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Countdown</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Comic Sans MS', cursive;
+      background: url("1.jpg") no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+      overflow: hidden;
+    }
+
+    .container {
+      position: relative;
+      z-index: 2;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .box {
+      position: relative;
+
+      width: 600px;        /* increase this */
+      height: 150px;       /* increase this */
+
+      padding: 20px;       /* reduce padding since size is fixed */
+      border-radius: 20px;
+
+      background: rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+
+      text-align: center;
+    }
+
+    .box h1 {
+      margin: 0 0 20px;
+      font-size: 2.5rem;
+    }
+
+    #countdown {
+      font-size: 2rem;
+    }
+
+    svg {
+      position: absolute;
+      top: -5px;
+      left: -5px;
+      width: calc(100% + 10px);
+      height: calc(100% + 10px);
+      pointer-events: none;
+    }
+
+    .bg {
+      fill: none;
+      stroke: rgba(255,255,255,0.2);
+      stroke-width: 4;
+    }
+
+    .bar {
+      fill: none;
+      stroke: #7F00FF;
+      stroke-width: 4;
+      stroke-linecap: round;
+    }
+
+    .kuromi {
+      position: absolute;
+      width: 80px;
+      transform: translate(-50%, -70%);
+    }
+
+    .flowers {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .flower {
+      position: absolute;
+      font-size: 2rem;
+      opacity: 0.7;
+      animation: float 10s infinite linear;
+    }
+
+    @keyframes float {
+      from { transform: translateY(100vh); }
+      to { transform: translateY(-10vh); }
+    }
+
+    .background-text {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  z-index: 0;
+  opacity: 0.05;
+
+  font-size: 2rem;
+  line-height: 1.4;
+
+  padding: 20px;        /* gives it breathing space */
+  box-sizing: border-box;
+
+  overflow: hidden;     /* prevents spill */
+}
+    .bg-word {
+      display: inline;       /* flow like normal text */
+      margin: 0;             /* REMOVE spacing */
+    }
+  </style>
+</head>
+<body>
+
+<div class="background-text" id="bgText"></div>
+<div class="flowers" id="flowers"></div>
+
+<div class="container">
+  <div class="box" id="box">
+
+    <svg id="svg">
+      <rect id="bg" class="bg" x="2" y="2" rx="20" ry="20" />
+      <rect id="bar" class="bar" x="2" y="2" rx="20" ry="20" />
+    </svg>
+
+    <img src="https://i.imgur.com/VIkMYDa.png" class="kuromi" id="kuromi" />
+
+    <h1>I cant wait to see you</h1>
+    <div id="countdown"></div>
+  </div>
+</div>
+
+<script>
+  const images = ["1.jpg", "2.jpg", "3.jpg", "4.jpg"];
+  const startDate = new Date("2026-04-01T00:00:00+05:30");
+  const targetDate = new Date("2026-06-12T22:38:00+05:30");
+  const totalDuration = targetDate - startDate;
+
+  const box = document.getElementById("box");
+  const bar = document.getElementById("bar");
+  const bg = document.getElementById("bg");
+  const kuromi = document.getElementById("kuromi");
+
+  function setup() {
+    const w = box.offsetWidth;
+    const h = box.offsetHeight;
+
+    bg.setAttribute("width", w);
+    bg.setAttribute("height", h);
+    bar.setAttribute("width", w);
+    bar.setAttribute("height", h);
+
+    const perimeter = 2 * (w + h);
+
+    bar.style.strokeDasharray = perimeter;
+
+    return perimeter;
+  }
+
+  let perimeter = setup();
+  window.addEventListener("resize", () => {
+    perimeter = setup();
+  });
+
+  function update() {
+    const now = new Date();
+
+    // countdown
+    const diff = targetDate - now;
+    if (diff <= 0) {
+      document.getElementById("countdown").innerHTML = "It's time 💜";
+      bar.style.strokeDashoffset = 0;
+      return;
+    }
+
+    const d = Math.floor(diff/(1000*60*60*24));
+    const h = Math.floor((diff/(1000*60*60))%24);
+    const m = Math.floor((diff/(1000*60))%60);
+    const s = Math.floor((diff/1000)%60);
+
+    document.getElementById("countdown").innerHTML = `${d}d ${h}h ${m}m ${s}s`;
+
+    // proper progress from April 1
+    let progress = (now - startDate) / totalDuration;
+    if (progress < 0) progress = 0;
+    if (progress > 1) progress = 1;
+
+    const offset = perimeter * (1 - progress);
+    bar.style.strokeDashoffset = offset;
+
+    // move kuromi smoothly
+    const dist = perimeter * progress;
+    const w = box.offsetWidth;
+    const h2 = box.offsetHeight;
+
+    let x = 0, y = 0;
+
+    if (dist < w) {
+      x = dist;
+      y = 0;
+    } else if (dist < w + h2) {
+      x = w;
+      y = dist - w;
+    } else if (dist < 2*w + h2) {
+      x = w - (dist - (w + h2));
+      y = h2;
+    } else {
+      x = 0;
+      y = h2 - (dist - (2*w + h2));
+    }
+
+    kuromi.style.left = x + "px";
+    kuromi.style.top = y + "px";
+  }
+
+  setInterval(update, 1000);
+  update();
+
+  // flowers
+  const flowersContainer = document.getElementById("flowers");
+  const flowerTypes = ["🌷","🌺","🌸","🌹","🪻","🍁","🪷"];
+
+  for (let i=0;i<30;i++){
+    const f=document.createElement("div");
+    f.className="flower";
+    f.innerText=flowerTypes[Math.floor(Math.random()*flowerTypes.length)];
+    f.style.left=Math.random()*100+"vw";
+    f.style.animationDuration=(5+Math.random()*10)+"s";
+    flowersContainer.appendChild(f);
+  }
+
+  // background text
+  function generateText(){
+    const now=new Date();
+    const diffDays=Math.floor((targetDate-now)/(1000*60*60*24));
+
+    let soCount=Math.max(2,30-diffDays);
+    let phrase="I miss you";
+
+    for(let i=0;i<soCount;i++) phrase+=" so";
+    phrase+=" much";
+    phrase+=" ";
+
+    return phrase;
+  }
+
+  function populateBackground(){
+    const container=document.getElementById("bgText");
+    const phrase=generateText();
+
+    for(let i=0;i<200;i++){
+      const span=document.createElement("span");
+      span.innerText=phrase;
+      container.appendChild(span);
+    }
+  }
+
+  //populateBackground();
+
+    // ===== BACKGROUND TEXT FROM FILE =====
+async function loadBackgroundText() {
+  try {
+    const response = await fetch("message.txt");
+
+    if (!response.ok) {
+      throw new Error("message.txt not found");
+    }
+
+    const text = await response.text();
+    const words = text.trim().split(/\s+/);
+
+    const now = new Date();
+
+    const daysLeft = Math.max(0,
+      Math.floor((targetDate - now) / (1000 * 60 * 60 * 24))
+    );
+
+    const n = words.length;
+
+    let count = n - daysLeft;
+    if (count < 1) count = 1;
+    if (count > n) count = n;
+
+    const selectedText = words.slice(0, count).join(" ");
+
+    const container = document.getElementById("bgText");
+
+    // 🔥 IMPORTANT FIXES
+    container.innerText = selectedText;
+
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+loadBackgroundText();
+</script>
+
+</body>
+</html>
