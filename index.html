@@ -105,7 +105,7 @@
   height: 100%;
 
   z-index: 0;
-  opacity: 0.05;
+  opacity: 0.5;
 
   font-size: 2rem;
   line-height: 1.4;
@@ -136,7 +136,7 @@
 
     <img src="https://i.imgur.com/VIkMYDa.png" class="kuromi" id="kuromi" />
 
-    <h1>I cant wait to see you</h1>
+    <h1>I cant wait to see you 💜</h1>
     <div id="countdown"></div>
   </div>
 </div>
@@ -189,7 +189,7 @@
     const m = Math.floor((diff/(1000*60))%60);
     const s = Math.floor((diff/1000)%60);
 
-    document.getElementById("countdown").innerHTML = `${d}d ${h}h ${m}m ${s}s`;
+    document.getElementById("countdown").innerHTML = `T- ${d}d ${h}h ${m}m ${s}s`;
 
     // proper progress from April 1
     let progress = (now - startDate) / totalDuration;
@@ -269,42 +269,47 @@
   //populateBackground();
 
     // ===== BACKGROUND TEXT FROM FILE =====
-async function loadBackgroundText() {
-  try {
-    const response = await fetch("message.txt");
+// ===== BACKGROUND TEXT FROM INLINE MESSAGE =====
 
-    if (!response.ok) {
-      throw new Error("message.txt not found");
-    }
+// 👉 write your full message here
+function generateText() {
+  const now = new Date();
 
-    const text = await response.text();
-    const words = text.trim().split(/\s+/);
+  const daysLeft = Math.max(0,
+    Math.floor((targetDate - now) / (1000 * 60 * 60 * 24))
+  );
 
-    const now = new Date();
+  // 👉 WRITE YOUR FULL MESSAGE HERE
+  const fullMessage = "I miss you in ways that words struggle to hold I miss you in the quiet moments when everything slows down I miss you when the day ends and there is no one to tell about it I miss you in the small things that used to feel ordinary I miss you in the spaces between thoughts I miss you more when I try not to think about it I miss you when something reminds me of you unexpectedly I miss you when I see something beautiful and wish you were there I miss you in the way time feels different without you I miss you in the silence that used to be comfortable I miss you in the laughter that feels incomplete I miss you when I hear songs that feel like us I miss you when I walk past places we would have talked about I miss you when I imagine conversations that never happen I miss you in the way the world feels slightly dimmer I miss you in the pauses of my day I miss you in the late nights when everything is still I miss you in the early mornings when everything begins again I miss you in the feeling of waiting I miss you in the thought of seeing you again I miss you in ways I didn’t know were possible I miss you in ways that keep growing I miss you more than I expected to I miss you more than I can explain I miss you in every version of the day I miss you when I am busy and when I am not I miss you when I try to distract myself I miss you when I give in to the feeling I miss you in the way memories replay softly I miss you in the way time stretches I miss you in the way everything feels just a little incomplete I miss you in the things I want to share I miss you in the thoughts I don’t say out loud I miss you in the quiet corners of my mind I miss you when I look at the sky and wonder if you are too I miss you when I think of what could be I miss you in the feeling of almost I miss you in the way hope stays I miss you in the way time keeps moving anyway I miss you in the spaces that used to feel full I miss you in the rhythm of days passing I miss you in the way I count time differently now I miss you in the way everything leads back to you I miss you in the feeling of waiting for something real I miss you in the way the world feels quieter I miss you in the way thoughts linger longer I miss you in the moments that feel unfinished I miss you in the way I notice everything more I miss you in the way I remember things clearly I miss you in the way I hold onto small details I miss you in the way time feels heavy and light at once I miss you in the way I keep going I miss you in the way I keep believing I miss you in the way I keep waiting I miss you in the way I know this will end someday I miss you in the thought of that day I miss you in the feeling that it will be worth it I miss you in the quiet certainty I carry I miss you in the way I keep counting I miss you in the way every day matters now I miss you in the way I notice each passing moment I miss you in the way I hold onto the future I miss you in the way I imagine seeing you again I miss you in the way that thought stays with me I miss you in the way it keeps me going I miss you in the way it gives everything meaning I miss you in the way it makes time feel important I miss you in the way I look forward instead of back I miss you in the way hope feels real I miss you in the way it all comes back to you";
 
-    const daysLeft = Math.max(0,
-      Math.floor((targetDate - now) / (1000 * 60 * 60 * 24))
-    );
+  const words = fullMessage.trim().split(/\s+/);
+  const n = words.length;
 
-    const n = words.length;
+  // (n - daysLeft) words initially, +1 each day
+  let count = n - daysLeft;
 
-    let count = n - daysLeft;
-    if (count < 1) count = 1;
-    if (count > n) count = n;
+  if (count < 1) count = 1;
+  if (count > n) count = n;
 
-    const selectedText = words.slice(0, count).join(" ");
+  return words.slice(0, count).join(" ");
+}
 
-    const container = document.getElementById("bgText");
+function populateBackground() {
+  const container = document.getElementById("bgText");
+  const phrase = generateText();
 
-    // 🔥 IMPORTANT FIXES
-    container.innerText = selectedText;
+  // clear previous content
+  container.innerHTML = "";
 
-  } catch (err) {
-    console.error(err);
+  // 👇 SAME STRUCTURE AS YOUR OLD WORKING CODE
+  for (let i = 0; i < 1; i++) {
+    const span = document.createElement("span");
+    span.innerText = phrase;
+    container.appendChild(span);
   }
 }
 
-loadBackgroundText();
+populateBackground();
 </script>
 
 </body>
